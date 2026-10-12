@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Un pequeño rincón lleno de amor 💗</title>
+<style>
+
+/* ============================================================
+   🎨 PALETA DE COLORES — cámbiala aquí si quieres otro estilo
+   ============================================================ */
+:root{
+  --rosa-claro:   #ffd9e6;
+  --rosa-medio:   #ffb3ce;
+  --rosa-fuerte:  #ff8fb3;
+  --lila:         #e3d3f7;
+  --crema:        #fff6ec;
+  --blanco:       #ffffff;
+  --texto-oscuro: #6b4a5a;
+  --texto-suave:  #9c7b8c;
+  --dorado:       #f6c667;
+
+  --fuente-titulo: 'Georgia', 'Times New Roman', serif;
+  --fuente-texto:  'Trebuchet MS', 'Segoe UI', sans-serif;
+}
+
+/* ============================================================
+   💌 NOMBRE DE TU PAREJA — cámbialo aquí y se usará en toda la página
+   (también puedes cambiarlo dentro del <span id="nombrePareja">)
+   ============================================================ */
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+html,body{
+  width:100%; height:100%;
+  overflow-x:hidden;
+  font-family: var(--fuente-texto);
+  background: linear-gradient(160deg, var(--crema), var(--rosa-claro) 60%, var(--lila));
+  color: var(--texto-oscuro);
+}
+
+body{ min-height:100vh; position:relative; }
+
+/* ------------------ Fondo animado (corazones, estrellas, brillos) ------------------ */
+#fondo-particulas{
+  position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden;
+}
+.particula-flotante{
+  position:absolute;
+  bottom:-40px;
+  opacity:.75;
+  animation: flotar linear infinite;
+  user-select:none;
+}
+@keyframes flotar{
+  0%{ transform: translateY(0) translateX(0) rotate(0deg); opacity:0; }
+  10%{ opacity:.8; }
+  90%{ opacity:.6; }
+  100%{ transform: translateY(-110vh) translateX(20px) rotate(25deg); opacity:0; }
+}
+
+/* corazones que salen de un clic */
+.corazon-click{
+  position:fixed;
+  pointer-events:none;
+  font-size:22px;
+  z-index:500;
+  animation: subirDesvanecer 1.1s ease-out forwards;
+}
+@keyframes subirDesvanecer{
+  0%{ transform: translateY(0) scale(0.6); opacity:1; }
+  100%{ transform: translateY(-120px) scale(1.2); opacity:0; }
+}
+
+/* ============================================================
+   ✨ PANTALLA DE INICIO
+   ============================================================ */
+#pantalla-inicio{
+  position:relative; z-index:2;
+  min-height:100vh;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:30px;
+  animation: apareceSuave 1.4s ease;
+}
+@keyframes apareceSuave{ from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
+
+.titulo-inicio{
+  font-family: var(--fuente-titulo);
+  font-size: clamp(2rem, 6vw, 3.2rem);
+  color: var(--rosa-fuerte);
+  text-shadow: 0 2px 12px rgba(255,140,180,.4);
+  margin-bottom: 18px;
+}
+.subtitulo-inicio{
+  font-size: clamp(1rem, 2.6vw, 1.25rem);
+  color: var(--texto-suave);
+  max-width: 480px;
+  line-height:1.6;
+  margin-bottom: 34px;
+}
+.gatito-inicio{
+  font-size: 4.2rem;
+  margin-bottom: 20px;
+  animation: bamboleo 3s ease-in-out infinite;
+}
+@keyframes bamboleo{
+  0%,100%{ transform: rotate(-4deg); }
+  50%{ transform: rotate(4deg); }
+}
+
+.boton-magico{
+  border:none;
+  cursor:pointer;
+  font-family: var(--fuente-texto);
+  font-size: 1.05rem;
+  font-weight:700;
+  color:#fff;
+  padding: 16px 34px;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--rosa-fuerte), var(--rosa-medio));
+  box-shadow: 0 8px 20px rgba(255,140,180,.45);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.boton-magico:hover{ transform: translateY(-3px) scale(1.04); box-shadow: 0 12px 26px rgba(255,140,180,.55); }
+.boton-magico:active{ transform: translateY(0) scale(.97); }
+
+/* ============================================================
+   🐱 ESCENA PRINCIPAL DE GATITOS
+   ============================================================ */
+#escena-gatitos{
+  position:relative; z-index:2;
+  display:none;
+  min-height:100vh;
+  padding: 90px 18px 60px;
+}
+#escena-gatitos.activa{ display:block; animation: apareceSuave 1s ease; }
+
+.encabezado-escena{
+  position:fixed; top:0; left:0; right:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 14px 22px;
+  background: linear-gradient(180deg, rgba(255,246,236,.95), rgba(255,246,236,.55));
+  backdrop-filter: blur(4px);
+}
+.contador-cartas{
+  font-weight:700;
+  color: var(--texto-oscuro);
+  background: var(--blanco);
+  padding: 8px 16px;
+  border-radius: 30px;
+  box-shadow: 0 3px 10px rgba(200,150,170,.25);
+  font-size: .95rem;
+}
+.titulo-escena{
+  font-family: var(--fuente-titulo);
+  color: var(--rosa-fuerte);
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  text-align:center;
+  flex:1;
+}
+
+/* ---------- contenedor de gatitos (cuadrícula ordenada) ---------- */
+#contenedor-gatitos{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  justify-items:center;
+  align-items:end;
+  gap: 46px 18px;
+  max-width: 1080px;
+  margin: 46px auto 0;
+  padding: 40px 10px 0;
+}
+
+.gato{
+  --color-cuerpo: #ffd7a8;
+  --color-oscuro: #f3b876;
+  --retraso: 0s;
+  position:relative;
+  width: 108px;
+  height: 168px;
+  cursor:pointer;
+  text-align:center;
+  transition: transform .25s ease;
+  animation: aparecerGato .6s ease both;
+}
+.gato:hover{ transform: translateY(-6px) scale(1.05); }
+.gato.saltando{ animation: saltoFeliz .6s ease; }
+@keyframes aparecerGato{ from{opacity:0; transform: translateY(30px) scale(.8);} to{opacity:1; transform:translateY(0) scale(1);} }
+@keyframes saltoFeliz{
+  0%{ transform: translateY(0) scale(1); }
+  30%{ transform: translateY(-22px) scale(1.08) rotate(-4deg); }
+  55%{ transform: translateY(0) scale(.96) rotate(3deg); }
+  75%{ transform: translateY(-8px) scale(1.02); }
+  100%{ transform: translateY(0) scale(1); }
+}
+
+/* cuerpecito+cabeza flotando suavemente todo el tiempo, cada gatito desfasado */
+.cuerpo-completo{
+  animation: flotarIdle 3.4s ease-in-out infinite;
+  animation-delay: var(--retraso);
+}
+@keyframes flotarIdle{
+  0%,100%{ transform: translateY(0) rotate(-1.2deg); }
+  50%{ transform: translateY(-9px) rotate(1.2deg); }
+}
+
+.gato.acostado .cuerpo-gato{ transform: scaleY(.6) scaleX(1.25); }
+.gato.acostado .cabeza-gato{ margin-top: -6px; }
+
+.cabeza-gato{
+  width:74px; height:64px;
+  background: var(--color-cuerpo);
+  border-radius: 50% 50% 46% 46%;
+  margin: 0 auto;
+  position:relative;
+  box-shadow: inset 0 -6px 10px rgba(0,0,0,.05);
+}
+/* orejas */
+.cabeza-gato::before, .cabeza-gato::after{
+  content:"";
+  position:absolute; top:-16px;
+  width:0; height:0;
+  border-left:15px solid transparent;
+  border-right:15px solid transparent;
+  border-bottom:26px solid var(--color-cuerpo);
+}
+.cabeza-gato::before{ left:2px; transform: rotate(-18deg); }
+.cabeza-gato::after{ right:2px; transform: rotate(18deg); }
+
+.oreja-interior{
+  position:absolute; top:-9px;
+  width:0; height:0;
+  border-left:8px solid transparent;
+  border-right:8px solid transparent;
+  border-bottom:15px solid var(--rosa-medio);
+}
+.oreja-interior.izq{ left:8px; transform: rotate(-18deg); }
+.oreja-interior.der{ right:8px; transform: rotate(18deg); }
+
+.cara-gato{ position:relative; top:22px; display:flex; justify-content:center; gap:16px; }
+.ojo{
+  width:8px; height:10px; background: var(--texto-oscuro);
+  border-radius:50%;
+  animation: parpadeo 4.5s infinite;
+}
+@keyframes parpadeo{ 0%,92%,100%{ transform:scaleY(1);} 95%{ transform:scaleY(.1);} }
+.gato.feliz .ojo{ height:5px; border-radius: 0 0 8px 8px; background:transparent; border-bottom:3px solid var(--texto-oscuro); }
+
+.nariz{
+  position:absolute; top:31px; left:50%; transform:translateX(-50%);
+  width:0; height:0;
+  border-left:4px solid transparent;
+  border-right:4px solid transparent;
+  border-top:5px solid var(--rosa-fuerte);
+}
+.boca{
+  position:absolute; top:35px; left:50%; transform:translateX(-50%);
+  width:14px; height:7px;
+  border-bottom: 2px solid var(--texto-oscuro);
+  border-radius: 0 0 10px 10px;
+  opacity:.7;
+}
+.mejilla{
+  position:absolute; top:29px;
+  width:11px; height:7px;
+  background: var(--rosa-medio);
+  border-radius:50%;
+  opacity:.75;
+}
+.mejilla.izq{ left:0px; }
+.mejilla.der{ right:0px; }
+
+.bigotes span{
+  position:absolute; height:1px; width:16px; background: var(--texto-suave); opacity:.6;
+}
+
+.cuerpo-gato{
+  width:64px; height:40px;
+  background: var(--color-oscuro);
+  border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
+  margin: -8px auto 0;
+}
+
+.accesorio-gato{
+  position:absolute;
+  font-size: 1.3rem;
+  animation: mecer 2.6s ease-in-out infinite;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.12));
+}
+@keyframes mecer{ 0%,100%{ transform: rotate(-6deg);} 50%{ transform: rotate(6deg);} }
+.accesorio-gato.sobre{ bottom:2px; left:-6px; }
+.accesorio-gato.corazon{ bottom:6px; right:-8px; }
+.accesorio-gato.flor{ top:-30px; right:6px; }
+
+.chispitas-alrededor{
+  position:absolute; inset:-14px; pointer-events:none;
+}
+.chispitas-alrededor span{
+  position:absolute; font-size:.7rem; opacity:.8;
+  animation: destello 2.2s ease-in-out infinite;
+}
+@keyframes destello{ 0%,100%{ opacity:.2; transform:scale(.7);} 50%{ opacity:1; transform:scale(1);} }
+
+.nombre-gato{
+  margin-top:10px;
+  font-size:.72rem;
+  color: var(--texto-suave);
+  font-style:italic;
+}
+
+.gato.descubierto .cabeza-gato{ box-shadow: 0 0 0 3px var(--dorado), inset 0 -6px 10px rgba(0,0,0,.05); }
+
+/* corazones de celebración al hacer clic en un gatito */
+.explosion-corazones{
+  position:absolute; left:50%; top:20%;
+  pointer-events:none;
+}
+.explosion-corazones span{
+  position:absolute; font-size:1rem;
+  animation: explotarCorazon .9s ease-out forwards;
+}
+@keyframes explotarCorazon{
+  0%{ transform: translate(0,0) scale(.4); opacity:1; }
+  100%{ transform: translate(var(--dx), var(--dy)) scale(1.1); opacity:0; }
+}
+
+/* ============================================================
+   💌 MODAL DE CARTA (sobre + hoja)
+   ============================================================ */
+#fondo-oscuro{
+  position:fixed; inset:0; z-index:900;
+  background: rgba(107, 74, 90, .45);
+  backdrop-filter: blur(2px);
+  display:none;
+  align-items:center; justify-content:center;
+  padding: 20px;
+}
+#fondo-oscuro.visible{ display:flex; animation: apareceSuave .35s ease; }
+
+.escena-carta{
+  perspective: 1200px;
+  width: min(90vw, 380px);
+}
+
+/* --- sobre de la carta emergente (clase única para no chocar con los accesorios de los gatitos) --- */
+.sobre-carta{
+  position:relative;
+  width:100%;
+  height: 240px;
+  background: linear-gradient(155deg, var(--rosa-claro), var(--blanco));
+  border-radius: 10px;
+  box-shadow: 0 20px 40px rgba(107,74,90,.3);
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  animation: apareceSuave .5s ease;
+}
+.sobre-solapa{
+  position:absolute; top:0; left:0; width:100%; height:50%;
+  background: linear-gradient(160deg, var(--rosa-medio), var(--rosa-fuerte));
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top;
+  transition: transform .7s cubic-bezier(.6,-0.2,.3,1.4);
+  border-radius: 10px 10px 0 0;
+  z-index:3;
+}
+.sobre-carta.abierto .sobre-solapa{ transform: rotateX(180deg); }
+.sello-corazon{
+  font-size:2rem; z-index:5; position:relative;
+  animation: latido 1.6s ease-in-out infinite;
+}
+@keyframes latido{ 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.15);} }
+.texto-sobre{
+  position:absolute; bottom:14px; width:100%; text-align:center;
+  font-size:.8rem; color: var(--texto-suave);
+}
+
+/* --- carta interior --- */
+.hoja-carta{
+  display:none;
+  background: var(--blanco);
+  border-radius: 14px;
+  padding: 34px 28px 28px;
+  box-shadow: 0 25px 50px rgba(107,74,90,.35);
+  text-align:center;
+  animation: deslizarArriba .7s ease forwards;
+  max-height: 80vh;
+  overflow-y:auto;
+}
+.hoja-carta.visible{ display:block; }
+@keyframes deslizarArriba{
+  from{ transform: translateY(60px); opacity:0; }
+  to{ transform: translateY(0); opacity:1; }
+}
+.encabezado-carta{
+  font-size:1.6rem; margin-bottom:14px;
+}
+.mensaje-carta{
+  font-family: var(--fuente-titulo);
+  font-size: 1.15rem;
+  line-height:1.75;
+  color: var(--texto-oscuro);
+  white-space: pre-wrap;
+  min-height: 60px;
+}
+.cursor-escritura{
+  display:inline-block; width:2px; background: var(--rosa-fuerte);
+  animation: parpadeoCursor .8s steps(1) infinite;
+}
+@keyframes parpadeoCursor{ 50%{ opacity:0; } }
+
+.firma-carta{
+  margin-top: 18px;
+  font-family: var(--fuente-titulo);
+  font-style:italic;
+  color: var(--rosa-fuerte);
+}
+
+.acciones-carta{
+  margin-top: 26px;
+  display:flex; flex-wrap:wrap; gap:12px; justify-content:center;
+}
+.boton-carta{
+  border:none; cursor:pointer;
+  font-family: var(--fuente-texto);
+  font-weight:700;
+  font-size:.88rem;
+  padding: 11px 20px;
+  border-radius: 40px;
+  transition: transform .2s ease;
+}
+.boton-carta.principal{
+  background: linear-gradient(135deg, var(--rosa-fuerte), var(--rosa-medio));
+  color:#fff;
+  box-shadow: 0 6px 16px rgba(255,140,180,.4);
+}
+.boton-carta.secundario{
+  background: var(--lila);
+  color: var(--texto-oscuro);
+}
+.boton-carta:hover{ transform: translateY(-2px) scale(1.03); }
+.boton-carta:active{ transform: scale(.96); }
+
+/* ============================================================
+   💗 PANTALLA FINAL
+   ============================================================ */
+#pantalla-final{
+  position:fixed; inset:0; z-index:950;
+  display:none;
+  align-items:center; justify-content:center;
+  flex-direction:column; text-align:center; padding:30px;
+  background: radial-gradient(circle at center, var(--rosa-claro), var(--lila) 80%);
+  overflow:hidden;
+}
+#pantalla-final.visible{ display:flex; animation: apareceSuave 1s ease; }
+
+.titulo-final-intermedio{
+  font-family: var(--fuente-titulo);
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  color: var(--rosa-fuerte);
+  margin-bottom:10px;
+}
+.subtitulo-final-intermedio{
+  color: var(--texto-suave);
+  margin-bottom: 6px;
+}
+
+.carta-final{
+  display:none;
+  background: var(--blanco);
+  border-radius: 20px;
+  padding: 40px 30px;
+  max-width: 560px;
+  box-shadow: 0 30px 70px rgba(107,74,90,.4);
+  position:relative;
+  animation: apareceSuave 1.2s ease;
+}
+.carta-final.visible{ display:block; }
+.mensaje-final{
+  font-family: var(--fuente-titulo);
+  font-size: 1.15rem;
+  line-height: 2;
+  color: var(--texto-oscuro);
+  white-space: pre-line;
+}
+.estrella-decorativa{
+  position:absolute; font-size:1.4rem; opacity:.85;
+  animation: destello 2.4s ease-in-out infinite;
+}
+
+/* partículas grandes de celebración final */
+.confeti-final{
+  position:absolute; inset:0; pointer-events:none; overflow:hidden;
+}
+.confeti-final span{
+  position:absolute; top:-30px;
+  animation: caerConfeti linear infinite;
+}
+@keyframes caerConfeti{
+  to{ transform: translateY(110vh) rotate(360deg); }
+}
+
+/* ============================================================
+   📱 RESPONSIVE
+   ============================================================ */
+@media (max-width: 640px){
+  #contenedor-gatitos{ gap:36px 12px; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); }
+  .gato{ width:84px; height:140px; }
+  .cabeza-gato{ width:58px; height:50px; }
+  .cuerpo-gato{ width:50px; height:32px; }
+  .titulo-escena{ display:none; }
+  .encabezado-escena{ justify-content:center; }
+  .mensaje-carta{ font-size:1rem; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- 🌸 Fondo con partículas flotantes (corazones, estrellitas, brillos) -->
+<div id="fondo-particulas"></div>
+
+<!-- ============================================================
+     ✨ PANTALLA DE INICIO
+     ============================================================ -->
+<section id="pantalla-inicio">
+  <div class="gatito-inicio">🐱</div>
+  <h1 class="titulo-inicio">Un pequeño rincón lleno de amor 💗</h1>
+  <p class="subtitulo-inicio">
+    Hay muchas cartitas escondidas por aquí para <span id="nombrePareja">ti</span>...<br>
+    ¿Puedes encontrarlas todas?
+  </p>
+  <button class="boton-magico" id="botonDescubrir">Descubrir mi regalo 💌</button>
+</section>
+
+<!-- ============================================================
+     🐱 ESCENA PRINCIPAL
+     ============================================================ -->
+<section id="escena-gatitos">
+  <div class="encabezado-escena">
+    <div class="titulo-escena">Toca a cada gatito 🐾</div>
+    <div class="contador-cartas" id="contadorCartas">💌 Cartitas descubiertas: 0 / 14</div>
+  </div>
+
+  <div id="contenedor-gatitos"></div>
+</section>
+
+<!-- ============================================================
+     💌 MODAL DE CARTA INDIVIDUAL
+     ============================================================ -->
+<div id="fondo-oscuro">
+  <div class="escena-carta">
+    <div class="sobre-carta" id="sobre">
+      <div class="sobre-solapa"></div>
+      <div class="sello-corazon">💗</div>
+      <div class="texto-sobre">Toca para abrir</div>
+    </div>
+    <div class="hoja-carta" id="hojaCarta">
+      <div class="encabezado-carta">💌</div>
+      <p class="mensaje-carta" id="mensajeCarta"></p>
+      <p class="firma-carta" id="firmaCarta"></p>
+      <div class="acciones-carta">
+        <button class="boton-carta principal" id="botonGuardar">Guardar este mensajito en mi corazón ❤️</button>
+        <button class="boton-carta secundario" id="botonVolver">Volver con los gatitos 🐱</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     💖 PANTALLA FINAL
+     ============================================================ -->
+<div id="pantalla-final">
+  <div class="confeti-final" id="confetiFinal"></div>
+  <div id="mensajeIntermedioFinal">
+    <div class="titulo-final-intermedio">¡Encontraste todas mis cartitas! 💗</div>
+    <p class="subtitulo-final-intermedio">Pero hay una última sorpresa...</p>
+  </div>
+  <div class="carta-final" id="cartaFinal">
+    <span class="estrella-decorativa" style="top:-10px;left:-10px;">✨</span>
+    <span class="estrella-decorativa" style="bottom:-10px;right:-10px;">⭐</span>
+    <p class="mensaje-final" id="mensajeFinalTexto"></p>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   💗 CONFIGURACIÓN RÁPIDA — modifica aquí lo que quieras personalizar
+   ================================================================ */
+
+// 💌 Nombre de tu pareja (se muestra en la pantalla de inicio)
+const NOMBRE_PAREJA = "mi amor";
+
+// 🐱 Mensajes de las cartas — cada uno se asigna a un gatito distinto
+const MENSAJES = [
+`Eres una de las cosas más bonitas que me han pasado. ❤️
+
+Desde que llegaste, todo cambió de una forma que ni siquiera sé explicar bien con palabras. Hay algo en la manera en que ves el mundo, en cómo te ríes de las cosas más pequeñas, que me hace sentir que la vida es mejor contigo en ella.
+
+No necesito que pase nada extraordinario para sentirme afortunado, me basta con saber que estás cerca.`,
+
+`Gracias por llenar mis días de momentos especiales.
+
+A veces son cosas pequeñitas: un mensaje justo cuando lo necesitaba, una risa compartida, un silencio cómodo mientras hacemos cualquier cosa juntos , LLAMADAS DE NOCHES. Pero esos detalles pequeños son los que, sumados, hacen que mi día valga la pena.
+
+Quiero que sepas que no doy por sentado ni uno solo de esos momentos.`,
+
+`Contigo hasta los días normales se sienten extraordinarios.
+
+No hace falta un plan grande ni una ocasión especial. Un día cualquiera, uno de esos que parecen iguales a todos los demás, se vuelve distinto simplemente porque lo vivo a tu lado.
+
+Eso es algo que valoro muchísimo de nosotros: la manera en que hacemos que lo simple se sienta bonito.`,
+
+`Me encanta compartir mi vida contigo.
+
+Compartir no solo los momentos felices, sino también los días difíciles, las dudas, los planes que todavía no sabemos cómo van a salir. Saber que hay alguien caminando a mi lado en todo eso me da una tranquilidad enorme.
+
+Contigo todo se siente un poco más liviano, incluso cuando las cosas se complican.`,
+
+`Nunca olvides lo mucho que te quiero.
+
+Sé que a veces la rutina, el cansancio o el día a día hacen que las palabras bonitas se digan menos de lo que deberían. Pero eso no significa que lo que siento haya cambiado, todo lo contrario.
+
+Quiero que esta cartita te lo recuerde en un día cualquiera: te quiero, así, sin motivo especial, simplemente porque eres tú.`,
+
+`Eres mi Princesita.
+
+¿mi princeshita?, mi princesita siempre es una buena mujer, una buena hija , la mejor enfermera en proceso y a graduarse a futuro, ninguna se compara contigo. Contigo puedo ser yo mismo a pesar de que no te gusta, sin filtros, sin miedo a que algo esté mal.
+
+Eso es un regalo que no todos los días se encuentra, y no pienso dejarlo pasar por alto.`,
+
+`Quiero seguir creando recuerdos bonitos contigo.
+
+Cuando pienso en el futuro, no pienso en cosas perfectas ni en planes enormes. Pienso en más tardes como esta, más risas tontas, más momentos que solo tienen sentido porque los vivimos juntos.
+
+Cada recuerdo que construimos se vuelve un pedacito más de nosotros, y quiero seguir sumando muchos más.`,
+
+`Gracias por existir y por formar parte de mi vida.
+
+A veces se me olvida decir las cosas más obvias, así que aquí va una: me alegra muchísimo que nuestros caminos se hayan cruzado. No fue algo que planeé, pero estoy muy agradecido de que haya pasado.
+
+Formar parte de tu vida, y que tú formes parte de la mía, es algo que aprecio de verdad.`,
+
+`Mi lugar favorito siempre será a tu lado.
+
+No importa si estamos en casa, de viaje, o simplemente sentados sin hacer nada en particular. Contigo cerca, cualquier lugar se convierte en el sitio donde más quiero estar.
+
+Es curioso cómo un lugar deja de ser solo un espacio y se vuelve algo especial, solo porque tú estás ahí.`,
+
+`Te elegiría una y mil veces más.
+
+Si pudiera volver atrás y decidir todo otra vez, no cambiaría nada del camino que nos trajo hasta aquí. Cada decisión, cada conversación, cada paso, me llevaron a ti, y eso lo volvería a elegir sin dudarlo.
+
+Contigo siento que estoy exactamente donde quiero estar.`,
+
+`Eres mi pequeño pedacito de felicidad.
+
+Hay días complicados, cansados, de esos donde todo parece pesar un poco más. Pero incluso en esos días, pensar en ti o hablar contigo logra aligerar las cosas.
+
+Eres de esas personas que, sin proponérselo, hacen que todo se vea un poco más brillante.`,
+
+`Espero que este pequeño regalo te saque una sonrisa.
+
+No es gran cosa, lo sé, pero lo hice pensando en ti de principio a fin. Cada gatito, cada cartita, cada detalle, tiene un poquito de cariño metido adentro.
+
+Si logré sacarte aunque sea una sonrisita mientras lo descubrías, entonces ya cumplió su propósito.`,
+
+`Contigo he aprendido que el amor también se construye en lo cotidiano.
+
+No solo en las fechas especiales o en los grandes gestos, sino en la manera en que nos cuidamos día a día, en cómo nos apoyamos cuando algo sale mal y celebramos juntos cuando algo sale bien.
+
+Eso es lo que más valoro de lo nuestro: que se siente real, constante, y verdadero.`,
+
+`Quiero que sepas que eres muy importante para mí, hoy y siempre.
+
+No importa cuántas cosas cambien alrededor, cuántos planes se muevan o cuántos días difíciles lleguen, hay algo que se mantiene firme: lo que siento por ti.
+
+Gracias por ser paciente, por ser cariñoso conmigo, y por dejarme ser parte de tu historia. 🐾💗`
+];
+
+// 💖 Mensaje final (aparece cuando se descubren todas las cartas)
+const MENSAJE_FINAL = `Si llegaste hasta aquí, significa que encontraste cada pequeño pedacito de amor que escondí para ti.
+
+Solo quería recordarte que eres una persona muy especial para mí y que me hace feliz tenerte en mi vida.
+
+Gracias por cada sonrisa, cada momento y cada recuerdo.
+
+Te quiero muchísimo. ❤️
+
+Y recuerda...
+Entre todos los gatitos de este mundo,
+yo siempre te elegiría a ti. 🐱💗`;
+
+// 🎨 Colores de pelaje disponibles para los gatitos (se reparten automáticamente)
+const COLORES_GATOS = [
+  { cuerpo:"#ffd7a8", oscuro:"#f3b876" }, // naranja
+  { cuerpo:"#f6e2d0", oscuro:"#e3c3a6" }, // crema
+  { cuerpo:"#e8e8e8", oscuro:"#cfcfcf" }, // gris
+  { cuerpo:"#efd6ec", oscuro:"#dcb9d8" }, // lila suave
+  { cuerpo:"#ffe0e8", oscuro:"#ffc2d1" }, // rosado
+  { cuerpo:"#fff6df", oscuro:"#f3e3ad" }, // amarillo suave
+];
+
+// 💌 Accesorios posibles para cada gatito
+const ACCESORIOS = ["sobre", "corazon", "flor"];
+const EMOJI_ACCESORIO = { sobre:"💌", corazon:"💗", flor:"🌸" };
+
+// cantidad de gatitos (recomendado 10 a 15)
+const CANTIDAD_GATOS = MENSAJES.length; // uno por cada mensaje
+
+document.getElementById("nombrePareja").textContent = NOMBRE_PAREJA;
+
+/* ================================================================
+   🌸 FONDO ANIMADO: corazones, estrellas y brillos flotando
+   ================================================================ */
+(function crearFondoParticulas(){
+  const contenedor = document.getElementById("fondo-particulas");
+  const simbolos = ["💗","✨","⭐","🌸","💫","♡"];
+  const total = 26;
+  for(let i=0;i<total;i++){
+    const el = document.createElement("span");
+    el.className = "particula-flotante";
+    el.textContent = simbolos[Math.floor(Math.random()*simbolos.length)];
+    el.style.left = Math.random()*100 + "vw";
+    el.style.fontSize = (12 + Math.random()*16) + "px";
+    el.style.animationDuration = (10 + Math.random()*14) + "s";
+    el.style.animationDelay = (Math.random()*14) + "s";
+    contenedor.appendChild(el);
+  }
+})();
+
+/* pequeños corazones al hacer clic en cualquier parte de la pantalla */
+document.addEventListener("click", function(e){
+  const corazon = document.createElement("span");
+  corazon.className = "corazon-click";
+  corazon.textContent = ["💗","💕","💓"][Math.floor(Math.random()*3)];
+  corazon.style.left = e.clientX + "px";
+  corazon.style.top = e.clientY + "px";
+  document.body.appendChild(corazon);
+  setTimeout(()=>corazon.remove(), 1100);
+});
+
+/* ================================================================
+   ✨ TRANSICIÓN: pantalla de inicio -> escena de gatitos
+   ================================================================ */
+document.getElementById("botonDescubrir").addEventListener("click", function(){
+  document.getElementById("pantalla-inicio").style.display = "none";
+  const escena = document.getElementById("escena-gatitos");
+  escena.classList.add("activa");
+  generarGatitos();
+});
+
+/* ================================================================
+   🐱 GENERACIÓN DE GATITOS
+   ================================================================ */
+const cartasDescubiertas = new Set();
+
+function generarGatitos(){
+  const contenedor = document.getElementById("contenedor-gatitos");
+  contenedor.innerHTML = "";
+
+  for(let i=0; i<CANTIDAD_GATOS; i++){
+    const color = COLORES_GATOS[i % COLORES_GATOS.length];
+    const accesorio = ACCESORIOS[i % ACCESORIOS.length];
+    const acostado = (i % 4 === 3); // uno de cada cuatro, acostadito
+
+    const gato = document.createElement("div");
+    gato.className = "gato" + (acostado ? " acostado" : "");
+    gato.style.setProperty("--color-cuerpo", color.cuerpo);
+    gato.style.setProperty("--color-oscuro", color.oscuro);
+    gato.style.setProperty("--retraso", (Math.random()*3.4).toFixed(2) + "s");
+    gato.dataset.indice = i;
+
+    gato.innerHTML = `
+      <div class="chispitas-alrededor">
+        <span style="top:0;left:6px;">✨</span>
+        <span style="top:10px;right:0;">💗</span>
+        <span style="bottom:20px;left:-6px;">⭐</span>
+      </div>
+      <div class="cuerpo-completo">
+        <div class="cabeza-gato">
+          <div class="oreja-interior izq"></div>
+          <div class="oreja-interior der"></div>
+          <div class="cara-gato">
+            <div class="ojo"></div>
+            <div class="ojo"></div>
+          </div>
+          <div class="nariz"></div>
+          <div class="boca"></div>
+          <div class="mejilla izq"></div>
+          <div class="mejilla der"></div>
+        </div>
+        <div class="cuerpo-gato"></div>
+      </div>
+      <div class="accesorio-gato ${accesorio}">${EMOJI_ACCESORIO[accesorio]}</div>
+      <div class="nombre-gato">Cartita ${i+1}</div>
+    `;
+
+    gato.addEventListener("click", function(ev){
+      reaccionGatito(gato, ev);
+      abrirCarta(i, gato);
+    });
+
+    contenedor.appendChild(gato);
+  }
+}
+
+/* reacción feliz + saltito + corazoncitos al tocar un gatito */
+function reaccionGatito(gato, evento){
+  gato.classList.add("feliz","saltando");
+  setTimeout(()=> gato.classList.remove("saltando"), 650);
+
+  const explosion = document.createElement("div");
+  explosion.className = "explosion-corazones";
+  const simbolos = ["💗","💕","✨","💓"];
+  for(let i=0;i<7;i++){
+    const s = document.createElement("span");
+    s.textContent = simbolos[Math.floor(Math.random()*simbolos.length)];
+    const angulo = Math.random()*Math.PI*2;
+    const distancia = 40 + Math.random()*40;
+    s.style.setProperty("--dx", Math.cos(angulo)*distancia + "px");
+    s.style.setProperty("--dy", Math.sin(angulo)*distancia + "px");
+    s.style.left = "0px"; s.style.top = "0px";
+    explosion.appendChild(s);
+  }
+  gato.appendChild(explosion);
+  setTimeout(()=> explosion.remove(), 1000);
+}
+
+/* ================================================================
+   💌 ABRIR / CERRAR CARTA (sobre -> hoja con mensaje)
+   ================================================================ */
+let indiceCartaActual = null;
+
+function abrirCarta(indice, gatoElemento){
+  indiceCartaActual = indice;
+
+  // reiniciar el modal a su estado "sobre cerrado"
+  const sobre = document.getElementById("sobre");
+  const hoja = document.getElementById("hojaCarta");
+  sobre.classList.remove("abierto");
+  sobre.style.display = "flex";
+  hoja.classList.remove("visible");
+
+  document.getElementById("fondo-oscuro").classList.add("visible");
+
+  // marcar como descubierta
+  if(!cartasDescubiertas.has(indice)){
+    cartasDescubiertas.add(indice);
+    if(gatoElemento) gatoElemento.classList.add("descubierto");
+    actualizarContador();
+  }
+}
+
+document.getElementById("sobre").addEventListener("click", function(){
+  this.classList.add("abierto");
+  setTimeout(()=>{
+    this.style.display = "none";
+    const hoja = document.getElementById("hojaCarta");
+    hoja.classList.add("visible");
+    escribirMensaje(MENSAJES[indiceCartaActual]);
+    document.getElementById("firmaCarta").textContent = "Con todo mi cariño, para " + NOMBRE_PAREJA + " 🐾";
+  }, 650);
+});
+
+/* animación de "escritura" del mensaje dentro de la carta */
+function escribirMensaje(texto){
+  const contenedor = document.getElementById("mensajeCarta");
+  contenedor.textContent = "";
+  let i = 0;
+  const cursor = document.createElement("span");
+  cursor.className = "cursor-escritura";
+  cursor.textContent = "|";
+
+  function escribir(){
+    if(i <= texto.length){
+      contenedor.textContent = texto.slice(0,i);
+      contenedor.appendChild(cursor);
+      i++;
+      setTimeout(escribir, 22);
+    } else {
+      cursor.remove();
+    }
+  }
+  escribir();
+}
+
+document.getElementById("botonVolver").addEventListener("click", cerrarCarta);
+document.getElementById("fondo-oscuro").addEventListener("click", function(e){
+  if(e.target === this) cerrarCarta();
+});
+
+function cerrarCarta(){
+  document.getElementById("fondo-oscuro").classList.remove("visible");
+
+  // si ya se descubrieron todas, mostramos la sorpresa final
+  if(cartasDescubiertas.size === CANTIDAD_GATOS){
+    setTimeout(mostrarPantallaFinal, 400);
+  }
+}
+
+/* botón "Guardar este mensajito en mi corazón" -> lluvia de corazones */
+document.getElementById("botonGuardar").addEventListener("click", function(){
+  for(let i=0;i<26;i++){
+    const corazon = document.createElement("span");
+    corazon.className = "corazon-click";
+    corazon.textContent = ["💗","💕","💓","❤️"][Math.floor(Math.random()*4)];
+    corazon.style.left = (Math.random()*100) + "vw";
+    corazon.style.top = (40 + Math.random()*40) + "vh";
+    corazon.style.fontSize = (18 + Math.random()*14) + "px";
+    document.body.appendChild(corazon);
+    setTimeout(()=>corazon.remove(), 1200);
+  }
+});
+
+/* ================================================================
+   💌 CONTADOR DE CARTAS DESCUBIERTAS
+   ================================================================ */
+function actualizarContador(){
+  document.getElementById("contadorCartas").textContent =
+    `💌 Cartitas descubiertas: ${cartasDescubiertas.size} / ${CANTIDAD_GATOS}`;
+}
+
+/* ================================================================
+   💖 PANTALLA FINAL — se muestra al descubrir todas las cartas
+   ================================================================ */
+function mostrarPantallaFinal(){
+  const pantalla = document.getElementById("pantalla-final");
+  pantalla.classList.add("visible");
+
+  // confeti de corazones y estrellas cayendo
+  const confeti = document.getElementById("confetiFinal");
+  const simbolos = ["💗","✨","⭐","💕","🌸"];
+  for(let i=0;i<40;i++){
+    const s = document.createElement("span");
+    s.textContent = simbolos[Math.floor(Math.random()*simbolos.length)];
+    s.style.left = Math.random()*100 + "vw";
+    s.style.fontSize = (14+Math.random()*16)+"px";
+    s.style.animationDuration = (4+Math.random()*4)+"s";
+    s.style.animationDelay = (Math.random()*3)+"s";
+    confeti.appendChild(s);
+  }
+
+  // después de unos segundos, aparece la carta final grande
+  setTimeout(()=>{
+    document.getElementById("mensajeIntermedioFinal").style.display = "none";
+    const cartaFinal = document.getElementById("cartaFinal");
+    cartaFinal.classList.add("visible");
+    document.getElementById("mensajeFinalTexto").textContent = MENSAJE_FINAL;
+  }, 2600);
+}
+
+</script>
+</body>
+</html>
